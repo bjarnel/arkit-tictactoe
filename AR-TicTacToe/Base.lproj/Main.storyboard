@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13122.17" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13104.14"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="AR_TicTacToe" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <arscnView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WA5-jJ-Nww">
+                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <connections>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="2Bg-ci-zff"/>
+                                </connections>
+                            </arscnView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4Uz-Xu-8jV">
+                                <rect key="frame" x="0.0" y="623" width="375" height="44"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jTx-ce-cmA">
+                                        <rect key="frame" x="16" y="7" width="68" height="30"/>
+                                        <state key="normal" title="Start over"/>
+                                        <connections>
+                                            <action selector="didTapStartOver:" destination="BYZ-38-t0r" eventType="touchUpInside" id="N1H-cn-iTy"/>
+                                        </connections>
+                                    </button>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="x put" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eu2-l6-zFn">
+                                        <rect key="frame" x="320.5" y="11.5" width="38.5" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.5" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstItem="jTx-ce-cmA" firstAttribute="centerY" secondItem="4Uz-Xu-8jV" secondAttribute="centerY" id="5Z6-Hj-Xgr"/>
+                                    <constraint firstItem="jTx-ce-cmA" firstAttribute="leading" secondItem="4Uz-Xu-8jV" secondAttribute="leading" constant="16" id="Wsr-ys-Gw9"/>
+                                    <constraint firstItem="eu2-l6-zFn" firstAttribute="centerY" secondItem="4Uz-Xu-8jV" secondAttribute="centerY" id="fkE-II-3TA"/>
+                                    <constraint firstAttribute="height" constant="44" id="glo-0S-Op2"/>
+                                    <constraint firstAttribute="trailing" secondItem="eu2-l6-zFn" secondAttribute="trailing" constant="16" id="uYT-bm-RFt"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="grc-88-rNd">
+                                <rect key="frame" x="67.5" y="269" width="240" height="128"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Move around to allow the app the find a plane..." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wyv-C6-wy1">
+                                        <rect key="frame" x="16" y="42.5" width="208" height="42.5"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="0.5" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="240" id="5wJ-Qh-TPN"/>
+                                    <constraint firstAttribute="height" constant="128" id="FgH-s0-XtD"/>
+                                    <constraint firstItem="wyv-C6-wy1" firstAttribute="centerY" secondItem="grc-88-rNd" secondAttribute="centerY" id="Sl3-6x-2av"/>
+                                    <constraint firstAttribute="trailing" secondItem="wyv-C6-wy1" secondAttribute="trailing" constant="16" id="Tna-Mf-xpv"/>
+                                    <constraint firstItem="wyv-C6-wy1" firstAttribute="leading" secondItem="grc-88-rNd" secondAttribute="leading" constant="16" id="Udx-bI-Y5E"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="4Uz-Xu-8jV" secondAttribute="trailing" id="FgX-Ak-3oz"/>
+                            <constraint firstAttribute="trailing" secondItem="WA5-jJ-Nww" secondAttribute="trailing" id="GwT-KV-N0H"/>
+                            <constraint firstItem="4Uz-Xu-8jV" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="QeX-1N-Kou"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="4Uz-Xu-8jV" secondAttribute="bottom" id="Wa2-x8-hbh"/>
+                            <constraint firstItem="WA5-jJ-Nww" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="ak6-0e-9ZL"/>
+                            <constraint firstItem="grc-88-rNd" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="lRu-Rh-xmH"/>
+                            <constraint firstItem="grc-88-rNd" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="pgN-YO-EVv"/>
+                            <constraint firstItem="WA5-jJ-Nww" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="w1P-JN-URt"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="WA5-jJ-Nww" secondAttribute="bottom" id="xpu-mo-xbo"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="gameStateLabel" destination="eu2-l6-zFn" id="a3M-fB-ZuS"/>
+                        <outlet property="planeSearchLabel" destination="wyv-C6-wy1" id="emQ-aF-l19"/>
+                        <outlet property="planeSearchOverlay" destination="grc-88-rNd" id="E9H-7L-FPz"/>
+                        <outlet property="sceneView" destination="WA5-jJ-Nww" id="Gaz-gg-YDe"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+    </scenes>
+</document>
