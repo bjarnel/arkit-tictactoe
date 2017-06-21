@@ -66,6 +66,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
     }
     var figures:[String:SCNNode] = [:]
+    var lightNode:SCNNode?
     var draggingFrom:GamePosition? = nil
     var draggingFromPosition:SCNVector3? = nil
     
@@ -78,7 +79,13 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         sceneView.delegate = self
         //sceneView.showsStatistics = true
+        // sceneView.antialiasingMode = .multisampling4X
+        //sceneView.preferredFramesPerSecond = 60
+        //sceneView.contentScaleFactor = 1.3
+        
         sceneView.scene = SCNScene()
+        sceneView.automaticallyUpdatesLighting = true
+        //sceneView.autoenablesDefaultLighting = false
         
         let tap = UITapGestureRecognizer()
         tap.addTarget(self, action: #selector(didTap))
@@ -124,6 +131,19 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     private func restoreGame(at position:SCNVector3) {
         board.node.position = position
         sceneView.scene.rootNode.addChildNode(board.node)
+        
+        let spotLight = SCNLight()
+        spotLight.type = .spot
+        spotLight.castsShadow = true
+        spotLight.spotInnerAngle = 70
+        spotLight.spotOuterAngle = 90
+        spotLight.zFar = 500
+        let constraint = SCNLookAtConstraint(target: board.node)
+        lightNode = SCNNode()
+        lightNode!.light = spotLight
+        lightNode!.position = SCNVector3(position.x, position.y + 25, position.z)
+        lightNode!.constraints = [constraint]
+        sceneView.scene.rootNode.addChildNode(lightNode!)
         
         for (key, figure) in figures {
             //TODO: how to get the coordinates for these?!?!?
@@ -297,6 +317,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         if node == currentPlane {
             removeAllFigures()
+            lightNode?.removeFromParentNode()
+            lightNode = nil
             board.node.removeFromParentNode()
             currentPlane = nil
         }
