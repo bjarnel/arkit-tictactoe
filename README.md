@@ -6,5 +6,10 @@ It works.. somewhat
 
 This obviously requires, Xcode 9 (BETA), iOS 11 (BETA) and a relatively recent iOS device.
 
-This is how it looks currently. Very ugly because I haven't fixed lighting yet.
-![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-nolighting.jpg)
+Update: I have added basic lighting.
+
+Future (when I get the time): I want to use actual textures and physics based lighting. (And yes I need to enable multisampling I think :-)
+
+![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-lighting.jpg)
+![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-closeup.jpg)
+![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-landscape.jpg)
