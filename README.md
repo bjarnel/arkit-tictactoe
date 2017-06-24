@@ -12,13 +12,13 @@ Update: I have added basic lighting.
 
 Future (when I get the time): make it look more realistic (drop shadows onto floor?)
 
-No with PBR (Physics based rendering/lighting):
+Now with PBR (Physics based rendering/lighting):
 ![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-pbr.jpg)
 ![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-pbr-closeup.jpg)
 
-Previous version without textures or PBR (just solid colours):
+Previous version without textures or PBR (just solid colors):
 ![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-lighting.jpg)
 
-First version without lighting (solid colours + only ambient light = crap):
+First version without lighting (solid colors + only ambient light = crap):
 ![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-nolighting.jpg)
 
