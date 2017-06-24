@@ -10,12 +10,15 @@ This obviously requires, Xcode 9 (BETA), iOS 11 (BETA) and a relatively recent i
 
 Update: I have added basic lighting.
 
-Future (when I get the time):
--use actual textures
--physics based lighting
--cast shadows on the floor/camera image :-)
--enable multisampling (I think)
+Future (when I get the time): make it look more realistic (drop shadows onto floor?)
 
+No with PBR (Physics based rendering/lighting):
+![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-pbr.jpg)
+![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-pbr-closeup.jpg)
+
+Previous version without textures or PBR (just solid colours):
 ![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-lighting.jpg)
-![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-closeup.jpg)
-![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-landscape.jpg)
+
+First version without lighting (solid colours + only ambient light = crap):
+![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-nolighting.jpg)
+
