@@ -8,8 +8,6 @@ The aim is this project is just to improve my knowledge of SceneKit and ARKit.
 
 This obviously requires, Xcode 9 (BETA), iOS 11 (BETA) and a relatively recent iOS device.
 
-Update: I have added basic lighting.
-
 Future (when I get the time): make it look more realistic (drop shadows onto floor?)
 
 Now with PBR (Physics based rendering/lighting):
