@@ -17,6 +17,7 @@
 		0633C8D91EF9108C00F6A311 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0633C8D81EF9108C00F6A311 /* GameState.swift */; };
 		0633C8DB1EF910CB00F6A311 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0633C8DA1EF910CB00F6A311 /* Extensions.swift */; };
 		0633C8DD1EF910D900F6A311 /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0633C8DC1EF910D900F6A311 /* Board.swift */; };
+		708A9ACA1EFEFF4700D010B9 /* Media.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 708A9AC91EFEFF4700D010B9 /* Media.scnassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,8 @@
 		0633C8D81EF9108C00F6A311 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
 		0633C8DA1EF910CB00F6A311 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		0633C8DC1EF910D900F6A311 /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
+		708A9A921EFEF94700D010B9 /* media_sources.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = media_sources.txt; sourceTree = "<group>"; };
+		708A9AC91EFEFF4700D010B9 /* Media.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = Media.scnassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +78,8 @@
 				0633C8D81EF9108C00F6A311 /* GameState.swift */,
 				0633C8DA1EF910CB00F6A311 /* Extensions.swift */,
 				0633C8DC1EF910D900F6A311 /* Board.swift */,
+				708A9A921EFEF94700D010B9 /* media_sources.txt */,
+				708A9AC91EFEFF4700D010B9 /* Media.scnassets */,
 			);
 			path = "AR-TicTacToe";
 			sourceTree = "<group>";
@@ -137,6 +142,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				708A9ACA1EFEFF4700D010B9 /* Media.scnassets in Resources */,
 				0633C8C91EF90F6600F6A311 /* LaunchScreen.storyboard in Resources */,
 				0633C8C61EF90F6600F6A311 /* Assets.xcassets in Resources */,
 				0633C8C41EF90F6600F6A311 /* Main.storyboard in Resources */,

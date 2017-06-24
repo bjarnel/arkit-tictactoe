@@ -82,10 +82,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // sceneView.antialiasingMode = .multisampling4X
         //sceneView.preferredFramesPerSecond = 60
         //sceneView.contentScaleFactor = 1.3
+        sceneView.antialiasingMode = .multisampling4X
         
-        sceneView.scene = SCNScene()
-        sceneView.automaticallyUpdatesLighting = true
-        //sceneView.autoenablesDefaultLighting = false
+        sceneView.automaticallyUpdatesLighting = false
         
         let tap = UITapGestureRecognizer()
         tap.addTarget(self, action: #selector(didTap))
@@ -94,6 +93,16 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let pan = UIPanGestureRecognizer()
         pan.addTarget(self, action: #selector(didPan))
         sceneView.addGestureRecognizer(pan)
+    }
+    
+    // from APples app
+    func enableEnvironmentMapWithIntensity(_ intensity: CGFloat) {
+        if sceneView.scene.lightingEnvironment.contents == nil {
+            if let environmentMap = UIImage(named: "Media.scnassets/environment_blur.exr") {
+                sceneView.scene.lightingEnvironment.contents = environmentMap
+            }
+        }
+        sceneView.scene.lightingEnvironment.intensity = intensity
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -132,6 +141,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         board.node.position = position
         sceneView.scene.rootNode.addChildNode(board.node)
         
+        /*
         let spotLight = SCNLight()
         spotLight.type = .spot
         spotLight.castsShadow = true
@@ -144,6 +154,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         lightNode!.position = SCNVector3(position.x, position.y + 25, position.z)
         lightNode!.constraints = [constraint]
         sceneView.scene.rootNode.addChildNode(lightNode!)
+         */
         
         for (key, figure) in figures {
             //TODO: how to get the coordinates for these?!?!?
@@ -299,6 +310,22 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     // MARK: - ARSCNViewDelegate
+    
+    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        
+        // from apples app
+        DispatchQueue.main.async {
+            // If light estimation is enabled, update the intensity of the model's lights and the environment map
+            if let lightEstimate = self.sceneView.session.currentFrame?.lightEstimate {
+                
+                // Apple divived the ambientIntensity by 40, I find that, atleast with the materials used
+                // here that it's a big too bright, so I increased to to 50..
+                self.enableEnvironmentMapWithIntensity(lightEstimate.ambientIntensity / 50)
+            } else {
+                self.enableEnvironmentMapWithIntensity(25)
+            }
+        }
+    }
     
     // did at plane(?)
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {

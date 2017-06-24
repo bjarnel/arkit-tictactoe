@@ -59,27 +59,19 @@ class Board {
             let geometry = SCNBox(width: width,
                                   height: height,
                                   length: length,
-                                  chamferRadius: 0)
-            geometry.firstMaterial!.diffuse.contents = UIColor.darkGray
-            geometry.firstMaterial!.specular.contents = UIColor.white
-            
-            let vgeometry = SCNBox(width: width,
-                                   height: height,
-                                   length: length,
-                                   chamferRadius: 0)
-            vgeometry.firstMaterial!.diffuse.contents = UIColor.darkGray
-            vgeometry.firstMaterial!.specular.contents = UIColor.white
-            
-            
-            
+                                  chamferRadius: height * 0.1)
+            geometry.firstMaterial?.lightingModel = .physicallyBased
+            geometry.firstMaterial?.diffuse.contents = UIImage(named: "Media.scnassets/scuffed-plastic2-alb.png")
+            geometry.firstMaterial?.roughness.contents = UIImage(named: "Media.scnassets/scuffed-plastic-rough.png")
+            geometry.firstMaterial?.metalness.contents = UIImage(named: "Media.scnassets/scuffed-plastic-metal.png")
+            geometry.firstMaterial?.normal.contents = UIImage(named: "Media.scnassets/scuffed-plastic-normal.png")
+            geometry.firstMaterial?.ambientOcclusion.contents = UIImage(named: "Media.scnassets/scuffed-plastic-ao.png")
             
             let horizontalLineNode = SCNNode(geometry: geometry)
             horizontalLineNode.position = SCNVector3(lineOffset, height * 0.5, 0)
             node.addChildNode(horizontalLineNode)
             
-            let verticalLineNode = SCNNode(geometry: vgeometry)
-            
-            // using euler angles the object rotates around itself ;)
+            let verticalLineNode = SCNNode(geometry: geometry)
             verticalLineNode.eulerAngles = SCNVector3(0, 90.0.degreesToRadians, 0)
             verticalLineNode.position = SCNVector3(0, height * 0.5, lineOffset)
             node.addChildNode(verticalLineNode)
