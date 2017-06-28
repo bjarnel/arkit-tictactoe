@@ -67,6 +67,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     var figures:[String:SCNNode] = [:]
     var lightNode:SCNNode?
+    var floorNode:SCNNode?
     var draggingFrom:GamePosition? = nil
     var draggingFromPosition:SCNVector3? = nil
     
@@ -79,7 +80,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         sceneView.delegate = self
         //sceneView.showsStatistics = true
-        // sceneView.antialiasingMode = .multisampling4X
+        //sceneView.antialiasingMode = .multisampling4X
         //sceneView.preferredFramesPerSecond = 60
         //sceneView.contentScaleFactor = 1.3
         sceneView.antialiasingMode = .multisampling4X
@@ -141,20 +142,20 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         board.node.position = position
         sceneView.scene.rootNode.addChildNode(board.node)
         
-        /*
-        let spotLight = SCNLight()
-        spotLight.type = .spot
-        spotLight.castsShadow = true
-        spotLight.spotInnerAngle = 70
-        spotLight.spotOuterAngle = 90
-        spotLight.zFar = 500
+        let light = SCNLight()
+        light.type = .directional
+        light.castsShadow = true
+        light.shadowRadius = 200
+        light.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.3)
+        light.shadowMode = .deferred
         let constraint = SCNLookAtConstraint(target: board.node)
         lightNode = SCNNode()
-        lightNode!.light = spotLight
-        lightNode!.position = SCNVector3(position.x, position.y + 25, position.z)
+        lightNode!.light = light
+        lightNode!.position = SCNVector3(position.x + 10, position.y + 10, position.z)
+        // lightNode!.eulerAngles = SCNVector3(45.0.degreesToRadians, 0, 0)
         lightNode!.constraints = [constraint]
         sceneView.scene.rootNode.addChildNode(lightNode!)
-         */
+ 
         
         for (key, figure) in figures {
             //TODO: how to get the coordinates for these?!?!?
@@ -237,7 +238,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             
         case .ended:
             print("ended \(location)")
-            let figure = Figure.figure(for: gameState.currentPlayer)
             
             guard let draggingFrom = draggingFrom,
                 let square = squareFrom(location: location),
@@ -249,27 +249,16 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             
             gameState = newGameState
             
-            // remove node!
-            //figures["\(draggingFrom.x)x\(draggingFrom.y)"]?.removeFromParentNode()
-            
-            // move in model!
+            // move in model
             figures["\(square.0.0)x\(square.0.1)"] = figures["\(draggingFrom.x)x\(draggingFrom.y)"]
             figures["\(draggingFrom.x)x\(draggingFrom.y)"] = nil
             self.draggingFrom = nil
             
-            //AAAh ah ah, MOVE NODE!
             // copy pasted insert thingie
             let newPosition = sceneView.scene.rootNode.convertPosition(square.1.position, from: square.1.parent)
             let action = SCNAction.move(to: newPosition,
                                         duration: 0.1)
             figures["\(square.0.0)x\(square.0.1)"]?.runAction(action)
-            
-            
-            //figure.position = square.1.position
-            
-            //sceneView.scene.rootNode.addChildNode(figure)
-            //figures["\(square.0.0)x\(square.0.1)"] = figure
-            
             
         case .failed:
             print("failed \(location)")
@@ -283,12 +272,25 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let location = sender.location(in: sceneView)
         
         // tap to place board..
-        guard let currentPlane = currentPlane else {
-            print("hit testing...")
+        guard let _ = currentPlane else {
             guard let newPlaneData = anyPlaneFrom(location: location) else { return }
+            
+            let floor = SCNFloor()
+            floor.reflectivity = 0
+            let material = SCNMaterial()
+            material.diffuse.contents = UIColor.white
+            
+            // https://stackoverflow.com/questions/30975695/scenekit-is-it-possible-to-cast-an-shadow-on-an-transparent-object/44799498#44799498
+            material.colorBufferWriteMask = SCNColorMask(rawValue: 0)
+            floor.materials = [material]
+            
+            floorNode = SCNNode(geometry: floor)
+            floorNode!.position = newPlaneData.1
+            sceneView.scene.rootNode.addChildNode(floorNode!)
             
             self.currentPlane = newPlaneData.0
             restoreGame(at: newPlaneData.1)
+            
             return
         }
         
@@ -329,7 +331,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     // did at plane(?)
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
-        print("didAdd")
         planeCount += 1
     }
     
@@ -340,12 +341,12 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     // did remove plane?
     func renderer(_ renderer: SCNSceneRenderer, didRemove node: SCNNode, for anchor: ARAnchor) {
-        print("didRemove")
-        
         if node == currentPlane {
             removeAllFigures()
             lightNode?.removeFromParentNode()
             lightNode = nil
+            floorNode?.removeFromParentNode()
+            floorNode = nil
             board.node.removeFromParentNode()
             currentPlane = nil
         }
