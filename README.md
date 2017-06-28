@@ -8,18 +8,10 @@ The aim is this project is just to improve my knowledge of SceneKit and ARKit.
 
 This obviously requires, Xcode 9 (BETA), iOS 11 (BETA) and a relatively recent iOS device.
 
-With shadows:
+Screenshots:
+=======
 ![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-shadows.jpg)
 ![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-shadows-closeup.jpg)
-
-With PBR (Physics based rendering/lighting):
-![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-pbr.jpg)
-
-Previous version without textures or PBR (just solid colors):
-![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-lighting.jpg)
-
-First version without lighting (solid colors + only ambient light = crap):
-![alt text](https://raw.githubusercontent.com/bjarnel/arkit-tictactoe/master/tictactoe-nolighting.jpg)
 
 License
 =======
