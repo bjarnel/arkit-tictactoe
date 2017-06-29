@@ -17,6 +17,7 @@
 		0633C8D91EF9108C00F6A311 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0633C8D81EF9108C00F6A311 /* GameState.swift */; };
 		0633C8DB1EF910CB00F6A311 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0633C8DA1EF910CB00F6A311 /* Extensions.swift */; };
 		0633C8DD1EF910D900F6A311 /* Board.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0633C8DC1EF910D900F6A311 /* Board.swift */; };
+		70065C021F05A98C00F3E801 /* GameAI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70065C011F05A98C00F3E801 /* GameAI.swift */; };
 		708A9ACA1EFEFF4700D010B9 /* Media.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 708A9AC91EFEFF4700D010B9 /* Media.scnassets */; };
 /* End PBXBuildFile section */
 
@@ -33,6 +34,8 @@
 		0633C8D81EF9108C00F6A311 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
 		0633C8DA1EF910CB00F6A311 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		0633C8DC1EF910D900F6A311 /* Board.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Board.swift; sourceTree = "<group>"; };
+		70065C001F05A00100F3E801 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		70065C011F05A98C00F3E801 /* GameAI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameAI.swift; sourceTree = "<group>"; };
 		708A9A921EFEF94700D010B9 /* media_sources.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = media_sources.txt; sourceTree = "<group>"; };
 		708A9AC91EFEFF4700D010B9 /* Media.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = Media.scnassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -51,6 +54,7 @@
 		0633C8B21EF90F6600F6A311 = {
 			isa = PBXGroup;
 			children = (
+				70065C001F05A00100F3E801 /* README.md */,
 				0633C8BD1EF90F6600F6A311 /* AR-TicTacToe */,
 				0633C8BC1EF90F6600F6A311 /* Products */,
 			);
@@ -76,6 +80,7 @@
 				0633C8D41EF9104400F6A311 /* Dimensions.swift */,
 				0633C8D61EF9107600F6A311 /* Figure.swift */,
 				0633C8D81EF9108C00F6A311 /* GameState.swift */,
+				70065C011F05A98C00F3E801 /* GameAI.swift */,
 				0633C8DA1EF910CB00F6A311 /* Extensions.swift */,
 				0633C8DC1EF910D900F6A311 /* Board.swift */,
 				708A9A921EFEF94700D010B9 /* media_sources.txt */,
@@ -159,6 +164,7 @@
 				0633C8C11EF90F6600F6A311 /* ViewController.swift in Sources */,
 				0633C8DB1EF910CB00F6A311 /* Extensions.swift in Sources */,
 				0633C8D71EF9107600F6A311 /* Figure.swift in Sources */,
+				70065C021F05A98C00F3E801 /* GameAI.swift in Sources */,
 				0633C8D91EF9108C00F6A311 /* GameState.swift in Sources */,
 				0633C8DD1EF910D900F6A311 /* Board.swift in Sources */,
 				0633C8BF1EF90F6600F6A311 /* AppDelegate.swift in Sources */,

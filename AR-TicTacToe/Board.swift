@@ -12,12 +12,12 @@ import SceneKit
 class Board {
     let node:SCNNode
     let nodeToSquare:[SCNNode:(Int,Int)]
+    let squareToPosition:[String:SCNVector3]
     
     init() {
         node = SCNNode()
         var nodeToSquare = [SCNNode:(Int,Int)]()
-        // var squareToNode = [String:SCNNode]()
-        // var squareLocations = [SCNVector3]()
+        var squareToPosition = [String:SCNVector3]()
         
         
         let length = Dimensions.SQUARE_SIZE * 4
@@ -51,6 +51,7 @@ class Board {
                     
                     node.addChildNode(squareNode)
                     nodeToSquare[squareNode] = square
+                    squareToPosition["\(square.0)x\(square.1)"] = position
                 }
             }
             
@@ -78,6 +79,7 @@ class Board {
         }
         
         self.nodeToSquare = nodeToSquare
+        self.squareToPosition = squareToPosition
     }
     
     

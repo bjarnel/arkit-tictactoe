@@ -42,26 +42,24 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     var currentPlane:SCNNode? {
         didSet {
             updatePlaneOverlay()
+            newTurn()
         }
     }
     let board = Board()
-    var gameState = GameState(currentPlayer: GameState.DefaultPlayer,
-                              mode: GameState.DefaultMode,
-                              board: GameState.EmptyBoard) {
+    var game:GameState! {
         didSet {
-            var s = gameState.currentPlayer.rawValue + " "
-            switch gameState.mode {
-            case .put: s += "put"
-            case .move: s += "move"
-            }
-            gameStateLabel.text = s
+            gameStateLabel.text = game.currentPlayer.rawValue + " to " + game.mode.rawValue
             
-            if let winner = gameState.currentWinner {
+            if let winner = game.currentWinner {
                 let alert = UIAlertController(title: "Game Over", message: "\(winner.rawValue) wins!!!!", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { action in
                     self.reset()
                 }))
                 present(alert, animated: true, completion: nil)
+            } else {
+                if currentPlane != nil {
+                    newTurn()
+                }
             }
         }
     }
@@ -77,6 +75,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        game = GameState()  // create new game
         
         sceneView.delegate = self
         //sceneView.showsStatistics = true
@@ -123,13 +123,42 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     private func reset() {
-        gameState = GameState(currentPlayer: GameState.DefaultPlayer,
-                              mode: GameState.DefaultMode,
-                              board: GameState.EmptyBoard)
+        game = GameState()
         
         removeAllFigures()
         
         figures.removeAll()
+    }
+    
+    private func newTurn() {
+        //run AI on background thread
+        DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
+            sleep(1)
+            
+            let action = GameAI(game: self.game).bestAction
+            
+            // once an action has been determined, perform it on main thread
+            DispatchQueue.main.async {
+                if let newGameState = self.game.perform(action: action) {
+                    
+                    
+                    // animate action
+                    switch action {
+                    case .put(let at):
+                        self.put(piece: Figure.figure(for: self.game.currentPlayer),
+                                 at: at)
+                        
+                    case .move(let from, let to):
+                        self.move(from: from,
+                                  to: to)
+                    }
+                    
+                    // update our game state
+                    self.game = newGameState
+                    
+                }
+            }
+        }
     }
     
     private func removeAllFigures() {
@@ -212,7 +241,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     // MARK: - Gestures
     
     @objc func didPan(_ sender:UIPanGestureRecognizer) {
-        guard case .move = gameState.mode else { return }
+        guard case .move = game.mode else { return }
         
         let location = sender.location(in: sceneView)
         
@@ -242,12 +271,13 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             guard let draggingFrom = draggingFrom,
                 let square = squareFrom(location: location),
                 square.0.0 != draggingFrom.x || square.0.1 != draggingFrom.y,
-                let newGameState = gameState.move(from: draggingFrom, to: (x: square.0.0, y: square.0.1)) else {
+                let newGameState = game.perform(action: .move(from: draggingFrom,
+                                                              to: (x: square.0.0, y: square.0.1))) else {
                     revertDrag()
                     return
             }
             
-            gameState = newGameState
+            game = newGameState
             
             // move in model
             figures["\(square.0.0)x\(square.0.1)"] = figures["\(draggingFrom.x)x\(draggingFrom.y)"]
@@ -255,7 +285,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             self.draggingFrom = nil
             
             // copy pasted insert thingie
-            let newPosition = sceneView.scene.rootNode.convertPosition(square.1.position, from: square.1.parent)
+            let newPosition = sceneView.scene.rootNode.convertPosition(square.1.position,
+                                                                       from: square.1.parent)
             let action = SCNAction.move(to: newPosition,
                                         duration: 0.1)
             figures["\(square.0.0)x\(square.0.1)"]?.runAction(action)
@@ -294,22 +325,42 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             return
         }
         
-        // otherwise tap to place board piece..
-        guard case .put = gameState.mode else { return }
-        
-        let figure = Figure.figure(for: gameState.currentPlayer)
+        // otherwise tap to place board piece.. (if we're in "put" mode)
+        guard case .put = game.mode else { return }
         
         if let squareData = squareFrom(location: location),
-           let newGameState = gameState.put(at: (x: squareData.0.0, y: squareData.0.1)) {
-            gameState = newGameState
+           let newGameState = game.perform(action: .put(at: (x: squareData.0.0,
+                                                             y: squareData.0.1))) {
             
-            // https://stackoverflow.com/questions/30392579/convert-local-coordinates-to-scene-coordinates-in-scenekit
-            // this works!
-            figure.position = sceneView.scene.rootNode.convertPosition(squareData.1.position, from: squareData.1.parent)
-            sceneView.scene.rootNode.addChildNode(figure)
-            figures["\(squareData.0.0)x\(squareData.0.1)"] = figure
+            put(piece: Figure.figure(for: game.currentPlayer),
+                at: squareData.0)
+            
+            game = newGameState
         }
     }
+    
+    /// animates AI moving a piece
+    private func move(from:GamePosition,
+                      to:GamePosition) {
+        //TODO
+    }
+    
+    /// renders user and AI insert of piece
+    private func put(piece:SCNNode,
+                     at position:GamePosition) {
+        let squareId = "\(position.x)x\(position.y)"
+        guard let squarePosition = board.squareToPosition[squareId] else { fatalError() }
+        
+        piece.opacity = 0  // initially invisible
+        // // https://stackoverflow.com/questions/30392579/convert-local-coordinates-to-scene-coordinates-in-scenekit
+        piece.position = sceneView.scene.rootNode.convertPosition(squarePosition,
+                                                                  from: board.node)
+        sceneView.scene.rootNode.addChildNode(piece)
+        figures[squareId] = piece
+        
+        piece.runAction(SCNAction.fadeIn(duration: 0.5))
+    }
+    
     
     // MARK: - ARSCNViewDelegate
     

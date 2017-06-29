@@ -10,65 +10,85 @@ import Foundation
 
 typealias GamePosition = (x:Int, y:Int)
 
-enum GameMode {
-    case put
-    case move
+enum GameMode:String {
+    case put = "put"
+    case move = "move"
 }
 
 enum GamePlayer:String {
     case x = "x"
     case o = "o"
-    
-    var next:GamePlayer {
-        switch self {
-        case .x: return .o
-        case .o: return .x
-        }
-    }
 }
 
+/// we have made the game actions generic in order to make it easier to implement the AI
+enum GameAction {
+    case put(at:GamePosition)
+    case move(from:GamePosition, to:GamePosition)
+}
+
+/// our completely immutable implementation of Tic-Tac-Toe
 struct GameState {
     let currentPlayer:GamePlayer
     let mode:GameMode
     let board:[[String]]
     
-    static let DefaultPlayer = GamePlayer.x
-    static let DefaultMode = GameMode.put
-    static let EmptyBoard = [["","",""],["","",""],["","",""]]
-    
-    // number of squares used, (if >= 6 then we need to MOVE elements)
-    private var numberOfSquaresUsed:Int {
-        return board.reduce(0, {
-            return $1.reduce($0, { return $0 + ($1 != "" ? 1 : 0) })
-        })
+    /// When you create a new game (GameState) you get a certain default state, which you cant
+    /// modify in any way
+    init() {
+        self.init(currentPlayer: arc4random_uniform(2) == 0 ? .x : .o,  // random start player
+                  mode: .put,   // start mode is to put/drop pieces
+                  board: [["","",""],["","",""],["","",""]])    // board is empty
     }
     
-    // put for current player
-    func put(at position:GamePosition) -> GameState? {
-        guard case .put = mode,
-            board[position.x][position.y] == "" else { return nil }
-        
-        var newBoard = board
-        newBoard[position.x][position.y] = currentPlayer.rawValue
-        
-        return GameState(currentPlayer: currentPlayer.next,
-                         mode: numberOfSquaresUsed >= 5 ? .move : .put,
-                         board: newBoard)
+    /// this private init allows the perform func to return a new GameState
+    private init(currentPlayer:GamePlayer,
+                 mode:GameMode,
+                 board:[[String]]) {
+        self.currentPlayer = currentPlayer
+        self.mode = mode
+        self.board = board
     }
     
-    // move for current player
-    func move(from fromPosition:GamePosition, to toPosition:GamePosition) -> GameState? {
-        guard case .move = mode,
-            board[fromPosition.x][fromPosition.y] == currentPlayer.rawValue,
-            board[toPosition.x][toPosition.y] == "" else { return nil }
-        
-        var newBoard = board
-        newBoard[fromPosition.x][fromPosition.y] = ""
-        newBoard[toPosition.x][toPosition.y] = currentPlayer.rawValue
-        
-        return GameState(currentPlayer: currentPlayer.next,
-                         mode: .move,
-                         board: newBoard)
+    // perform action in the game, if successful returns new GameState
+    func perform(action:GameAction) -> GameState? {
+        switch action {
+        case .put(let at):
+            // are we in "put" mode and is the destination square empty?
+            guard case .put = mode,
+                  board[at.x][at.y] == "" else { return nil }
+            
+            // generate a new board state
+            var newBoard = board
+            newBoard[at.x][at.y] = currentPlayer.rawValue
+            
+            // determine how many pieces has been placed
+            let numberOfSquaresUsed = newBoard.reduce(0, {
+                return $1.reduce($0, { return $0 + ($1 != "" ? 1 : 0) })
+            })
+            
+            // generate new game state and return it
+            return GameState(currentPlayer: currentPlayer == .x ? .o : .x,
+                             mode: numberOfSquaresUsed >= 6 ? .move : .put,
+                             board: newBoard)
+            
+        case .move(let from, let to):
+            // are we in "move" mode and does the from piece match the current player
+            // and is the destination square empty?
+            guard case .move = mode,
+                  board[from.x][from.y] == currentPlayer.rawValue,
+                  board[to.x][to.y] == "" else { return nil }
+            
+            // generate a new board state
+            var newBoard = board
+            newBoard[from.x][from.y] = ""
+            newBoard[to.x][to.y] = currentPlayer.rawValue
+            
+            // generate new game state and return it
+            return GameState(currentPlayer: currentPlayer == .x ? .o : .x,
+                             mode: .move,
+                             board: newBoard)
+            
+        }
     }
     
     // is there a winner?
