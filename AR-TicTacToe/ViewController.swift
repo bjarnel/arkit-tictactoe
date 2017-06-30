@@ -131,32 +131,40 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     private func newTurn() {
+        //TODO: do nothing here if currentPlayer isn't an AI player..
+        
         //run AI on background thread
         DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
-            sleep(1)
-            
+            // let the AI determine which action to perform
             let action = GameAI(game: self.game).bestAction
             
             // once an action has been determined, perform it on main thread
             DispatchQueue.main.async {
-                if let newGameState = self.game.perform(action: action) {
+                // perform action or crash (game AI should never return an invalid action!)
+                guard let newGameState = self.game.perform(action: action) else { fatalError() }
                     
-                    
-                    // animate action
-                    switch action {
-                    case .put(let at):
-                        self.put(piece: Figure.figure(for: self.game.currentPlayer),
-                                 at: at)
-                        
-                    case .move(let from, let to):
-                        self.move(from: from,
-                                  to: to)
+                // block to execute after we have updated/animated the visual state of the game
+                let updateGameState = {
+                    // for some reason we have to put this in a main.async block in order to actually
+                    // get to main thread. It appears that SceneKit animations do not return on mainthread..
+                    DispatchQueue.main.async {
+                        self.game = newGameState
                     }
-                    
-                    // update our game state
-                    self.game = newGameState
-                    
                 }
+                
+                // animate action
+                switch action {
+                case .put(let at):
+                    self.put(piece: Figure.figure(for: self.game.currentPlayer),
+                             at: at,
+                             completionHandler: updateGameState)
+                    
+                case .move(let from, let to):
+                    self.move(from: from,
+                              to: to,
+                              completionHandler: updateGameState)
+                }
+                
             }
         }
     }
@@ -187,7 +195,15 @@ class ViewController: UIViewController, ARSCNViewDelegate {
  
         
         for (key, figure) in figures {
-            //TODO: how to get the coordinates for these?!?!?
+            // yeah yeah, I know I should turn GamePosition into a struct and provide it with
+            // Equtable and Hashable then this stupid stringy stuff would be gone. Will do this eventually
+            let xyComponents = key.components(separatedBy: "x")
+            guard xyComponents.count == 2,
+                  let x = Int(xyComponents[0]),
+                  let y = Int(xyComponents[1]) else { fatalError() }
+            put(piece: figure,
+                at: (x: x,
+                     y: y))
         }
     }
     
@@ -259,7 +275,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         case .changed:
             print("changed \(location)")
             guard let draggingFrom = draggingFrom,
-                let groundPosition = groundPositionFrom(location: location) else { return }
+                  let groundPosition = groundPositionFrom(location: location) else { return }
             
             let action = SCNAction.move(to: SCNVector3(groundPosition.x, groundPosition.y + Float(Dimensions.DRAG_LIFTOFF), groundPosition.z),
                                         duration: 0.1)
@@ -280,7 +296,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             game = newGameState
             
             // move in model
-            figures["\(square.0.0)x\(square.0.1)"] = figures["\(draggingFrom.x)x\(draggingFrom.y)"]
+            let toSquareId = "\(square.0.0)x\(square.0.1)"
+            figures[toSquareId] = figures["\(draggingFrom.x)x\(draggingFrom.y)"]
             figures["\(draggingFrom.x)x\(draggingFrom.y)"] = nil
             self.draggingFrom = nil
             
@@ -289,7 +306,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
                                                                        from: square.1.parent)
             let action = SCNAction.move(to: newPosition,
                                         duration: 0.1)
-            figures["\(square.0.0)x\(square.0.1)"]?.runAction(action)
+            figures[toSquareId]?.runAction(action)
             
         case .failed:
             print("failed \(location)")
@@ -341,13 +358,43 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     /// animates AI moving a piece
     private func move(from:GamePosition,
-                      to:GamePosition) {
-        //TODO
+                      to:GamePosition,
+                      completionHandler: (() -> Void)? = nil) {
+        
+        let fromSquareId = "\(from.x)x\(from.y)"
+        let toSquareId = "\(to.x)x\(to.y)"
+        guard let piece = figures[fromSquareId],
+              let rawDestinationPosition = board.squareToPosition[toSquareId]  else { fatalError() }
+        
+        // this stuff will change once we stop putting nodes directly in world space..
+        let destinationPosition = sceneView.scene.rootNode.convertPosition(rawDestinationPosition,
+                                                                           from: board.node)
+        
+        // update visual game state
+        figures[toSquareId] = piece
+        figures[fromSquareId] = nil
+        
+        // create drag and drop animation
+        let pickUpAction = SCNAction.move(to: SCNVector3(piece.position.x, piece.position.y + Float(Dimensions.DRAG_LIFTOFF), piece.position.z),
+                                          duration: 0.25)
+        let moveAction = SCNAction.move(to: SCNVector3(destinationPosition.x, destinationPosition.y + Float(Dimensions.DRAG_LIFTOFF), destinationPosition.z),
+                                        duration: 0.5)
+        let dropDownAction = SCNAction.move(to: destinationPosition,
+                                            duration: 0.25)
+        
+        // run drag and drop animation
+        piece.runAction(pickUpAction) {
+            piece.runAction(moveAction) {
+                piece.runAction(dropDownAction,
+                                completionHandler: completionHandler)
+            }
+        }
     }
     
     /// renders user and AI insert of piece
     private func put(piece:SCNNode,
-                     at position:GamePosition) {
+                     at position:GamePosition,
+                     completionHandler: (() -> Void)? = nil) {
         let squareId = "\(position.x)x\(position.y)"
         guard let squarePosition = board.squareToPosition[squareId] else { fatalError() }
         
@@ -358,7 +405,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.scene.rootNode.addChildNode(piece)
         figures[squareId] = piece
         
-        piece.runAction(SCNAction.fadeIn(duration: 0.5))
+        let action = SCNAction.fadeIn(duration: 0.5)
+        piece.runAction(action,
+                        completionHandler: completionHandler)
     }
     
     
