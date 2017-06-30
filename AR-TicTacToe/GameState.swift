@@ -10,6 +10,11 @@ import Foundation
 
 typealias GamePosition = (x:Int, y:Int)
 
+enum GamePlayerType:String {
+    case human = "human"
+    case ai = "ai"
+}
+
 enum GameMode:String {
     case put = "put"
     case move = "move"

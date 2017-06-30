@@ -8,6 +8,9 @@
 
 import Foundation
 
+private let MAX_ITERATIONS = 3
+private let SCORE_WINNING = 100
+
 /// this very simple Tic-Tac-Toe AI takes full advantage of the fact that the GameState
 /// is an immutable struct..
 struct GameAI {
@@ -31,6 +34,7 @@ struct GameAI {
         return positions
     }
     
+    /// returns list of possible actions given the GameState
     private func possibleActions() -> [GameAction] {
         let emptySquares = gameSquaresWhere(playerIs: nil)
         
@@ -53,16 +57,53 @@ struct GameAI {
         return actions
     }
     
+    /// returns list of SCORED possible actions given GameState and a player bias (player who we want to win)
+    /// Recursively simulates actions and the effect of actions..
+    private func scoredPossibleActions(playerBias:GamePlayer,
+                                       iterationCount:Int = 0) -> [(score:Int, action:GameAction)] {
+        var scoredActions = [(score:Int, action:GameAction)]()
+        
+        for action in possibleActions() {
+            var score = 0
+            guard let gameStatePostAction = game.perform(action: action) else { fatalError() }
+            
+            if let winner = gameStatePostAction.currentWinner {
+                let scoreForWin = SCORE_WINNING - iterationCount
+                if winner == playerBias {    // if playerBias wins it's posivetive score!
+                    score += scoreForWin
+                } else {    // otherwise negative score!
+                    score -= scoreForWin * 2
+                }
+                
+            } else {
+                // add score average for follow up actions..
+                if iterationCount < MAX_ITERATIONS {
+                    let followUpActions = GameAI(game: gameStatePostAction).scoredPossibleActions(playerBias: playerBias,
+                                                                                                  iterationCount: iterationCount + 1)
+                    var minScoredAction:(score:Int, action:GameAction)? = nil
+                    for scoredAction in followUpActions {
+                        if minScoredAction == nil || minScoredAction!.score > scoredAction.score {
+                            minScoredAction = scoredAction
+                        }
+                    }
+                    score += minScoredAction!.score
+                }
+                
+            }
+            
+            scoredActions.append((score: score, action: action))
+        }
+        
+        return scoredActions
+    }
+    
     var bestAction:GameAction {
-        // determine every possible action
-        let actions = possibleActions()
-        
-        // score every possible action
-        //TODO: recursively..
-        
-        // return action with highest score
-        //TODO
-        
-        return actions[Int(arc4random_uniform(UInt32(actions.count)))]
+        var topScoredAction:(score:Int, action:GameAction)? = nil
+        for scoredAction in scoredPossibleActions(playerBias: game.currentPlayer) {
+            if topScoredAction == nil || topScoredAction!.score < scoredAction.score {
+                topScoredAction = scoredAction
+            }
+        }
+        return topScoredAction!.action
     }
 }

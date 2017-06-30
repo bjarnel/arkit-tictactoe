@@ -34,6 +34,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
     }
     
+    var playerType = [
+        GamePlayer.x: GamePlayerType.human,
+        GamePlayer.o: GamePlayerType.ai
+    ]
     var planeCount = 0 {
         didSet {
             updatePlaneOverlay()
@@ -48,7 +52,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     let board = Board()
     var game:GameState! {
         didSet {
-            gameStateLabel.text = game.currentPlayer.rawValue + " to " + game.mode.rawValue
+            gameStateLabel.text = game.currentPlayer.rawValue + ":" + playerType[game.currentPlayer]!.rawValue.uppercased() + " to " + game.mode.rawValue
             
             if let winner = game.currentWinner {
                 let alert = UIAlertController(title: "Game Over", message: "\(winner.rawValue) wins!!!!", preferredStyle: .alert)
@@ -123,6 +127,33 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     private func reset() {
+        let alert = UIAlertController(title: "Game type", message: "Choose players", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "x:HUMAN vs o:AI", style: .default, handler: { action in
+            self.beginNewGame([
+                GamePlayer.x: GamePlayerType.human,
+                GamePlayer.o: GamePlayerType.ai
+                ])
+        }))
+        alert.addAction(UIAlertAction(title: "x:HUMAN vs o:HUMAN", style: .default, handler: { action in
+            self.beginNewGame([
+                GamePlayer.x: GamePlayerType.human,
+                GamePlayer.o: GamePlayerType.human
+                ])
+        }))
+        alert.addAction(UIAlertAction(title: "x:AI vs o:AI", style: .default, handler: { action in
+            self.beginNewGame([
+                GamePlayer.x: GamePlayerType.ai,
+                GamePlayer.o: GamePlayerType.ai
+                ])
+        }))
+        present(alert, animated: true, completion: nil)
+        
+        
+        
+    }
+    
+    private func beginNewGame(_ players:[GamePlayer:GamePlayerType]) {
+        playerType = players
         game = GameState()
         
         removeAllFigures()
@@ -131,7 +162,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     private func newTurn() {
-        //TODO: do nothing here if currentPlayer isn't an AI player..
+        guard playerType[game.currentPlayer]! == .ai else { return }
         
         //run AI on background thread
         DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
@@ -257,7 +288,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     // MARK: - Gestures
     
     @objc func didPan(_ sender:UIPanGestureRecognizer) {
-        guard case .move = game.mode else { return }
+        guard case .move = game.mode,
+              playerType[game.currentPlayer]! == .human else { return }
         
         let location = sender.location(in: sceneView)
         
@@ -293,9 +325,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
                     return
             }
             
-            game = newGameState
             
-            // move in model
+            
+            // move in visual model
             let toSquareId = "\(square.0.0)x\(square.0.1)"
             figures[toSquareId] = figures["\(draggingFrom.x)x\(draggingFrom.y)"]
             figures["\(draggingFrom.x)x\(draggingFrom.y)"] = nil
@@ -306,7 +338,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
                                                                        from: square.1.parent)
             let action = SCNAction.move(to: newPosition,
                                         duration: 0.1)
-            figures[toSquareId]?.runAction(action)
+            figures[toSquareId]?.runAction(action) {
+                DispatchQueue.main.async {
+                    self.game = newGameState
+                }
+            }
             
         case .failed:
             print("failed \(location)")
@@ -343,16 +379,21 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
         
         // otherwise tap to place board piece.. (if we're in "put" mode)
-        guard case .put = game.mode else { return }
+        guard case .put = game.mode,
+              playerType[game.currentPlayer]! == .human else { return }
         
         if let squareData = squareFrom(location: location),
            let newGameState = game.perform(action: .put(at: (x: squareData.0.0,
                                                              y: squareData.0.1))) {
             
             put(piece: Figure.figure(for: game.currentPlayer),
-                at: squareData.0)
+                at: squareData.0) {
+                    DispatchQueue.main.async {
+                        self.game = newGameState
+                    }
+            }
             
-            game = newGameState
+            
         }
     }
     
