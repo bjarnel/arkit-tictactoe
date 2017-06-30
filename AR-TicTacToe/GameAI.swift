@@ -69,14 +69,14 @@ struct GameAI {
             
             if let winner = gameStatePostAction.currentWinner {
                 let scoreForWin = SCORE_WINNING - iterationCount
-                if winner == playerBias {    // if playerBias wins it's posivetive score!
+                if winner == playerBias {    // if playerBias wins it's positive score!
                     score += scoreForWin
-                } else {    // otherwise negative score!
+                } else {    // otherwise big negative score!
                     score -= scoreForWin * 2
                 }
                 
             } else {
-                // add score average for follow up actions..
+                // add worst follow-up action score..
                 if iterationCount < MAX_ITERATIONS {
                     let followUpActions = GameAI(game: gameStatePostAction).scoredPossibleActions(playerBias: playerBias,
                                                                                                   iterationCount: iterationCount + 1)
