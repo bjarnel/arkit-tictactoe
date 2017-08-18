@@ -1,5 +1,5 @@
 # arkit-tictactoe
-Bjarne Lundgren / bjarne@sent.com / @bjarnel
+Bjarne Lundgren / bjarne@sent.com / [@bjarnel](https://twitter.com/bjarnel)
 
 In this example I have taken the simple scenekit tic-tac-toe (another of my repositories), and tried to put it in ARKit:)
 
